@@ -10,28 +10,37 @@
         body { font-family: sans-serif; background: #121212; color: white; padding: 10px; margin: 0; }
         .container { max-width: 1000px; margin: auto; padding-bottom: 50px; }
         h1 { text-align: center; color: #00e676; font-size: 1.5em; margin: 20px 0; }
+        
         .stats { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
         .card { background: #1e1e1e; padding: 12px; border-radius: 8px; text-align: center; flex: 1; border: 1px solid #333; }
-        .card h2 { font-size: 0.8em; margin: 0; color: #888; text-transform: uppercase; }
-        .card p { font-size: 1.3em; font-weight: bold; margin: 5px 0 0; color: #00e676; }
-        .chart-container { background: #1e1e1e; padding: 15px; border-radius: 8px; border: 1px solid #333; height: 450px; }
+        .card h3 { margin: 0; font-size: 0.8em; color: #888; text-transform: uppercase; }
+        .card p { margin: 5px 0 0; font-size: 1.2em; font-weight: bold; color: #00e676; }
+
+        .chart-container { background: #1e1e1e; padding: 15px; border-radius: 8px; border: 1px solid #333; height: 400px; position: relative; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Ceny Elektřiny</h1>
+
         <div class="stats">
-            <div class="card"><h2>Aktuální Cena</h2><p id="curr-price">--</p></div>
-            <div class="card"><h2>Tarif</h2><p id="curr-tarif">--</p></div>
-            <div class="card"><h2>Výkup</h2><p id="curr-sell">--</p></div>
+            <div class="card">
+                <h3>Aktuální cena</h3>
+                <p id="price-value">-- €</p>
+            </div>
+            <div class="card">
+                <h3>Tarif</h3>
+                <p id="tarif-value" style="color: #2196f3;">--</p>
+            </div>
         </div>
+
         <div class="chart-container">
             <canvas id="priceChart"></canvas>
         </div>
     </div>
 
     <script>
-        let priceChart;
+        let chart;
 
         function updateDashboard() {
             Papa.parse("ceny_final_5min.csv", {
@@ -42,46 +51,44 @@
                 complete: function(results) {
                     const data = results.data;
                     
-                    // Příprava dat pro graf
-                    const labels = data.map(d => d.Cas);
-                    const cenaKonecna = data.map(d => parseFloat(d.Cena_Konecna));
-                    const sell = data.map(d => parseFloat(d.Sell));
-                    const fix = data.map(d => parseFloat(d.Fix));
-                    const plyn = data.map(d => parseFloat(d.Plyn));
+                    // Příprava dat z CSV
+                    const labels = data.map(row => row.Cas);
+                    const konecna = data.map(row => parseFloat(row.Cena_Konecna));
+                    const sell = data.map(row => parseFloat(row.Sell));
+                    const fix = data.map(row => parseFloat(row.Fix));
+                    const plyn = data.map(row => parseFloat(row.Plyn));
 
-                    // Aktualizace horních karet (poslední platný záznam)
-                    const lastRow = data[data.length - 1];
-                    if (lastRow) {
-                        document.getElementById('curr-price').innerText = lastRow.Cena_Konecna + " Kč";
-                        document.getElementById('curr-tarif').innerText = lastRow.Tarif;
-                        document.getElementById('curr-sell').innerText = lastRow.Sell + " Kč";
+                    // Aktualizace karet s posledními hodnotami
+                    if (data.length > 0) {
+                        const lastRow = data[data.length - 1];
+                        document.getElementById('price-value').innerText = lastRow.Cena_Konecna + " €";
+                        document.getElementById('tarif-value').innerText = lastRow.Tarif;
                     }
 
-                    const ctx = document.getElementById('priceChart').getContext('2d');
-                    
-                    if (priceChart) priceChart.destroy();
+                    if (chart) chart.destroy();
 
-                    priceChart = new Chart(ctx, {
+                    const ctx = document.getElementById('priceChart').getContext('2d');
+                    chart = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: labels,
                             datasets: [
                                 { 
-                                    label: 'Cena Konečná', 
-                                    data: cenaKonecna, 
+                                    label: 'Konečná', 
+                                    data: konecna, 
                                     borderColor: '#00e676', 
-                                    backgroundColor: 'rgba(0, 230, 118, 0.1)', // Vybarvená plocha
-                                    fill: true, 
-                                    borderWidth: 2, 
+                                    backgroundColor: 'rgba(0, 230, 118, 0.1)', 
+                                    fill: true, // Vybarvená plocha u Konečné
+                                    borderWidth: 1.5, 
                                     pointRadius: 0, 
-                                    tension: 0.2 
+                                    tension: 0.1 
                                 },
                                 { 
-                                    label: 'Sell', 
+                                    label: 'Výkup', 
                                     data: sell, 
                                     borderColor: '#2196f3', 
-                                    fill: false,
-                                    borderWidth: 1.5, // Standardní tloušťka
+                                    fill: false, // Plocha u Výkupu zrušena
+                                    borderWidth: 1.5, 
                                     pointRadius: 0, 
                                     tension: 0.1 
                                 },
@@ -89,8 +96,8 @@
                                     label: 'Fix', 
                                     data: fix, 
                                     borderColor: '#ff9800', 
-                                    fill: false,
-                                    borderWidth: 0.7, // Tenká linka
+                                    fill: false, 
+                                    borderWidth: 0.8, // Tenčí linka
                                     pointRadius: 0, 
                                     tension: 0.1 
                                 },
@@ -98,8 +105,8 @@
                                     label: 'Plyn', 
                                     data: plyn, 
                                     borderColor: '#f44336', 
-                                    fill: false,
-                                    borderWidth: 0.7, // Tenká linka
+                                    fill: false, 
+                                    borderWidth: 0.8, // Tenčí linka
                                     pointRadius: 0, 
                                     tension: 0.1 
                                 }
@@ -122,7 +129,7 @@
                             plugins: { 
                                 legend: { 
                                     position: 'top', 
-                                    labels: { color: 'white', boxWidth: 15, padding: 15 } 
+                                    labels: { color: 'white', boxWidth: 12, padding: 15 } 
                                 } 
                             }
                         }
@@ -131,6 +138,7 @@
             });
         }
 
+        // První spuštění a nastavení intervalu 2 minuty
         updateDashboard();
         setInterval(updateDashboard, 120000);
     </script>
