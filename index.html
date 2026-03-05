@@ -55,6 +55,7 @@
             <div class="card"><h3>Aktuální</h3><p id="curr">-</p></div>
             <div class="card"><h3>Baterie</h3><p id="bat">-</p></div>
             <div class="card"><h3>Výkup</h3><p id="sell">-</p></div>
+            
         </div>
 
         <div class="chart-container">
@@ -102,6 +103,8 @@
                     const konecna = filteredData.map(r => parseFloat(r.Cena_Konecna.replace(',', '.')));
                     const bat = filteredData.map(r => parseFloat(r.Cena_Bat.replace(',', '.')));
                     const sell = filteredData.map(r => parseFloat(r.Sell.replace(',', '.')));
+                    const fix = filteredData.map(r => parseFloat(r.Fix.replace(',', '.')));
+                    const plyn = filteredData.map(r => parseFloat(r.Plyn.replace(',', '.')));
 
                     // Čas platnosti v záhlaví (aktuální čas z prvního řádku dat)
                     const startTime = filteredData[0].Cas;
@@ -144,9 +147,11 @@
                         data: {
                             labels: labels,
                             datasets: [
-                                { label: 'Konečná', data: konecna, borderColor: '#00e676', backgroundColor: '#00e676', borderWidth: 3, pointRadius: 0, tension: 0.1 },
+                                { label: 'Konečná', data: konecna, borderColor: '#00e676', backgroundColor: '#00e676', fill: true, borderWidth: 3, pointRadius: 0, tension: 0.1 },
                                 { label: 'Baterie', data: bat, borderColor: '#ff9800', borderDash: [5, 5], borderWidth: 1.5, pointRadius: 0, tension: 0.1 },
-                                { label: 'Výkup', data: sell, borderColor: '#2196f3', backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: true, borderWidth: 1.5, pointRadius: 0, tension: 0.1 }
+                                { label: 'Výkup', data: sell, borderColor: '#2196f3', backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: false, borderWidth: 1.5, pointRadius: 0, tension: 0.1 }
+                                { label: 'Fix', data: fix, borderColor: '#ff9800', backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: false, borderWidth: 1, pointRadius: 0, tension: 0.1 }
+                                { label: 'Plyn', data: plyn, borderColor: '#f44336', backgroundColor: 'rgba(33, 150, 243, 0.1)', fill: false, borderWidth: 1.5, pointRadius: 0, tension: 0.1 }
                             ]
                         },
                         options: {
@@ -180,3 +185,4 @@
     </script>
 </body>
 </html>
+
