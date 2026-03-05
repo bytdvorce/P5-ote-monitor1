@@ -1,0 +1,32 @@
+name: OTE_Update
+
+on:
+  schedule:
+    - cron: '15 * * * *' # Každou hodinu v 15. minutě
+    # Extra aktualizace pro zachycení nových cen na další den:
+    - cron: '30 11 * * *' 
+    - cron: '30 12 * * *' 
+    - cron: '30 13 * * *' 
+    - cron: '30 14 * * *' 
+    - cron: '30 15 * * *' 
+    - cron: '30 16 * * *' 
+    - cron: '30 17 * * *' 
+  workflow_dispatch:      # Umožní spustit ručně tlačítkem
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true  
+
+jobs:
+  run_script:
+    runs-on: windows-latest
+    permissions:
+      contents: write    # Důležité: umožní GitHubu zapisovat změny do CSV
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ImportExcel
+        shell: powershell
+        run: Install-Module ImportExcel -Force -Scope CurrentUser
+      - name: Run Script
+        shell: powershell
+        run: ./Get-OteCeny.ps1
