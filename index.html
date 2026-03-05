@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceny Elektřiny Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; padding: 10px; margin: 0; }
+        .container { max-width: 1000px; margin: auto; padding-bottom: 50px; }
+        h1 { text-align: center; color: #00e676; font-size: 1.5em; margin: 20px 0; }
+        
+        .stats { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+        .card { background: #1e1e1e; padding: 12px; border-radius: 8px; text-align: center; flex: 1; border: 1px solid #333; }
+        .card h3 { margin: 0; font-size: 0.8em; color: #888; text-transform: uppercase; }
+        .card p { margin: 5px 0 0; font-size: 1.2em; font-weight: bold; color: #00e676; }
+
+        .chart-container { background: #1e1e1e; padding: 15px; border-radius: 8px; border: 1px solid #333; height: 400px; position: relative; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ceny Elektřiny</h1>
+
+        <div class="stats">
+            <div class="card">
+                <h3>Aktuální cena</h3>
+                <p id="price-value">-- €</p>
+            </div>
+            <div class="card">
+                <h3>Tarif</h3>
+                <p id="tarif-value" style="color: #2196f3;">--</p>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+
+        function updateDashboard() {
+            Papa.parse("ceny_final_5min.csv", {
+                download: true,
+                header: true,
+                delimiter: ";",
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data;
+                    
+                    // Příprava dat z CSV
+                    const labels = data.map(row => row.Cas);
+                    const konecna = data.map(row => parseFloat(row.Cena_Konecna));
+                    const sell = data.map(row => parseFloat(row.Sell));
+                    const fix = data.map(row => parseFloat(row.Fix));
+                    const plyn = data.map(row => parseFloat(row.Plyn));
+
+                    // Aktualizace karet s posledními hodnotami
+                    if (data.length > 0) {
+                        const lastRow = data[data.length - 1];
+                        document.getElementById('price-value').innerText = lastRow.Cena_Konecna + " €";
+                        document.getElementById('tarif-value').innerText = lastRow.Tarif;
+                    }
+
+                    if (chart) chart.destroy();
+
+                    const ctx = document.getElementById('priceChart').getContext('2d');
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { 
+                                    label: 'Konečná', 
+                                    data: konecna, 
+                                    borderColor: '#00e676', 
+                                    backgroundColor: 'rgba(0, 230, 118, 0.1)', 
+                                    fill: true, // Vybarvená plocha u Konečné
+                                    borderWidth: 1.5, 
+                                    pointRadius: 0, 
+                                    tension: 0.1 
+                                },
+                                { 
+                                    label: 'Výkup', 
+                                    data: sell, 
+                                    borderColor: '#2196f3', 
+                                    fill: false, // Plocha u Výkupu zrušena
+                                    borderWidth: 1.5, 
+                                    pointRadius: 0, 
+                                    tension: 0.1 
+                                },
+                                { 
+                                    label: 'Fix', 
+                                    data: fix, 
+                                    borderColor: '#ff9800', 
+                                    fill: false, 
+                                    borderWidth: 0.8, // Tenčí linka
+                                    pointRadius: 0, 
+                                    tension: 0.1 
+                                },
+                                { 
+                                    label: 'Plyn', 
+                                    data: plyn, 
+                                    borderColor: '#f44336', 
+                                    fill: false, 
+                                    borderWidth: 0.8, // Tenčí linka
+                                    pointRadius: 0, 
+                                    tension: 0.1 
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { intersect: false, mode: 'index' },
+                            scales: { 
+                                x: { 
+                                    grid: { display: false },
+                                    ticks: { color: '#888', autoSkip: true, maxTicksLimit: 12 }
+                                }, 
+                                y: { 
+                                    grid: { color: '#333' },
+                                    ticks: { color: '#888' }
+                                } 
+                            },
+                            plugins: { 
+                                legend: { 
+                                    position: 'top', 
+                                    labels: { color: 'white', boxWidth: 12, padding: 15 } 
+                                } 
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // První spuštění a nastavení intervalu 2 minuty
+        updateDashboard();
+        setInterval(updateDashboard, 120000);
+    </script>
+</body>
+</html>
