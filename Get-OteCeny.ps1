@@ -35,7 +35,7 @@ try {
     $hdoLinesAll[14] = Get-ConvertedValue 24 "priplatek" $eurRateNum
     $hdoLinesAll[15] = Get-ConvertedValue 25 "srazka" $eurRateNum
     $hdoLinesAll[16] = Get-ConvertedValue 18 "fixEUR" $eurRateNum
-    $hdoLinesAll[17] = "EUR;$eurRateStr"
+    $hdoLinesAll[17] = "EUR;$eurRateNum"
 
     $hdoLinesAll | Set-Content -Path $hdoFile -Encoding UTF8
     Write-Host "Kurz EUR aktualizován: $eurRateStr"
