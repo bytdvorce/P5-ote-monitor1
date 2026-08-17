@@ -3,7 +3,7 @@
 
 # Cesta k souboru (univerzální pro GitHub i PC)
 $hdoFile = Join-Path $PSScriptRoot "hdo500.csv"
-$outputFile = Join-Path $PSScriptRoot "ceny_final_5min.csv"
+$outputFile = Join-Path $PSScriptRoot "ceny_final_5min_1.csv"
 
 Write-Host "--- SPUŠTĚNÍ AUTOMATIZACE (GitHub Actions) ---"
 
@@ -136,7 +136,7 @@ if ($finalRows.Count -gt 0) {
 if ($env:GITHUB_ACTIONS) {
     git config --global user.name "GitHub Action"
     git config --global user.email "action@github.com"
-    git add hdo500.csv ceny_final_5min.csv
+    git add hdo500.csv ceny_final_5min_1.csv
     git commit -m "Auto-update: $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
     git push
 
