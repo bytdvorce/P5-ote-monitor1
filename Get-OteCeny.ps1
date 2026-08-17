@@ -59,14 +59,15 @@ function Get-HdoValue($lineIndex) {
     return 0
 }
 
-$T1 = Get-HdoValue 10
-$T2 = Get-HdoValue 11
-$baterie = Get-HdoValue 12
+$T1 = Get-HdoValue 21
+$T2 = Get-HdoValue 22
+$baterie = Get-HdoValue 23
 $batProc = Get-HdoValue 13
-$Priplatek = Get-HdoValue 14
-$srazka = Get-HdoValue 15
-$fixEUR = Get-HdoValue 16
+$Priplatek = Get-HdoValue 24
+$srazka = Get-HdoValue 25
+$fix = Get-HdoValue 18
 $plyn = Get-HdoValue 19
+$EUR = Get-HdoValue 17
 
 $hdoMap = @{}
 foreach ($line in $rawHdo[1..7]) {
@@ -105,9 +106,10 @@ foreach ($date in $dates) {
                     }
                 }
                 
-                $cenaKonecna = if ($isLow) { $cenaSpot + $T2 + $Priplatek } else { $cenaSpot + $T1 + $Priplatek }
-                $cenaFix = if ($isLow) { $fixEUR + $T2 } else { $fixEUR + $T1 }
-                $divisor = if ($batProc -gt 0) { $batProc } else { 1 }
+                $cenaKonecna = { $cenaSpot * $EUR }
+                $cenaFix = if ($isLow) { $fix + $T2 } else { $fix + $T1 }
+                $divisor = if ($batProc -gt 0) { $batProc } else { 0.9 }
+                $divisor = if ($batProc -gt 0) { $batProc } else { 0.9 }
                 
                 $finalRows += [PSCustomObject]@{
                     Datum = $date.ToString("yyyy-MM-dd")
@@ -115,9 +117,9 @@ foreach ($date in $dates) {
                     Cena_Spot = $cenaSpot
                     Tarif = if ($isLow) { "NT" } else { "VT" }
                     Cena_Konecna = "{0:N2}" -f ($cenaKonecna * 1.21)
-                    Cena_Bat = "{0:N2}" -f ($baterie + (($cenaKonecna * 1.21) / $divisor))
-                    Sell = "{0:N2}" -f ($cenaSpot - $srazka)
-                    Fix = "{0:N2}" -f ($cenaFix * 1.21)
+                    Cena_Bat = "{0:N2}" -f (($cenaKonecna) * $divisor) - ($baterie / $divisor) - $srazka)
+                    Sell = "{0:N2}" -f ($cenaKonecna - $srazka)
+                    Fix = "{0:N2}" -f $cenaFix
                     Plyn = "{0:N2}" -f $plyn
                 }
             }
