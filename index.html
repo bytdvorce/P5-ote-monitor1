@@ -117,9 +117,9 @@
                     document.getElementById('time-validity').innerText = `Platnost: ${startTime} – ${endTime}`;
 
                     // Horní karty
-                    document.getElementById('curr').innerText = konecna[0].toFixed(2) + " €";
-                    document.getElementById('bat').innerText = bat[0].toFixed(2) + " €";
-                    document.getElementById('sell').innerText = sell[0].toFixed(2) + " €";
+                    document.getElementById('curr').innerText = konecna[0].toFixed(2) + "";
+                    document.getElementById('bat').innerText = bat[0].toFixed(2) + "";
+                    document.getElementById('sell').innerText = sell[0].toFixed(2) + "";
 
                     // Tabulka
                     const tableBody = document.getElementById('tableBody');
@@ -130,9 +130,9 @@
                         
                         row.innerHTML = `
                             <td>${r.Cas}</td>
-                            <td>${konecna[index].toFixed(2)} €</td>
-                            <td>${bat[index].toFixed(2)} €</td>
-                            <td>${sell[index].toFixed(2)} €</td>
+                            <td>${konecna[index].toFixed(2)}</td>
+                            <td>${bat[index].toFixed(2)}</td>
+                            <td>${sell[index].toFixed(2)}</td>
                         `;
                         tableBody.appendChild(row);
                     });
