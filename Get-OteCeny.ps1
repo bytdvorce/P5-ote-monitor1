@@ -38,7 +38,7 @@ try {
     $hdoLinesAll[17] = "EUR;$eurRateNum"
 
     $hdoLinesAll | Set-Content -Path $hdoFile -Encoding UTF8
-    Write-Host "Kurz EUR aktualizován: $eurRateStr"
+    Write-Host "Kurz EUR aktualizován: $eurRateNum"
     $rawHdo = Get-Content -Path $hdoFile -Encoding UTF8
 } catch { Write-Host "Chyba ČNB: $($_.Exception.Message)" }
 
