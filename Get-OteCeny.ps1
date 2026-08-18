@@ -106,7 +106,7 @@ foreach ($date in $dates) {
                     }
                 }
                 
-                $cenaKonecna = { $cenaSpot * $EUR }
+                $cenaKonecna = $cenaSpot * $EUR
                 $cenaFix = if ($isLow) { $fix + $T2 } else { $fix + $T1 }
                 $divisor = if ($batProc -gt 0) { $batProc } else { 0.9 }
                 $divisor = if ($batProc -gt 0) { $batProc } else { 0.9 }
